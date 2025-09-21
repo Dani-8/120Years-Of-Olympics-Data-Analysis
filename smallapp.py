@@ -1,8 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
+import plotly.express as px
 
 # --- 1. SET UP THE PAGE AND TITLE ---
 st.set_page_config(page_title="Olympic Medal Prediction", layout="wide")
@@ -34,22 +33,15 @@ st.write("This section shows key insights from the Olympic dataset.")
 if df is not None:
     # Visualization 1: Athlete Age Distribution
     st.subheader("Athlete Age Distribution")
-    fig, ax = plt.subplots(figsize=(8, 5))
-    df['Age'].dropna().hist(bins=30, ax=ax, edgecolor='black')
-    ax.set_xlabel("Age")
-    ax.set_ylabel("Number of Athletes")
-    ax.set_title("Distribution of Athlete Ages")
-    st.pyplot(fig)
+    fig = px.histogram(df.dropna(subset=['Age']), x='Age', nbins=30, title="Distribution of Athlete Ages")
+    fig.update_layout(bargap=0.1)
+    st.plotly_chart(fig, use_container_width=True)
 
     # Visualization 2: Top 10 Countries by Total Medals
     st.subheader("Top 10 Countries by Total Medals")
-    country_medals = df.groupby('NOC')['Medal'].count().sort_values(ascending=False).head(10)
-    fig, ax = plt.subplots(figsize=(10, 6))
-    sns.barplot(x=country_medals.index, y=country_medals.values, ax=ax, palette='viridis')
-    ax.set_ylabel("Total Medals")
-    ax.set_xlabel("Country Code")
-    ax.set_title("Top 10 Countries by Total Medal Count (1896-2016)")
-    st.pyplot(fig)
+    country_medals = df.groupby('NOC')['Medal'].count().sort_values(ascending=False).head(10).reset_index()
+    fig = px.bar(country_medals, x='NOC', y='Medal', title="Top 10 Countries by Total Medal Count (1896-2016)")
+    st.plotly_chart(fig, use_container_width=True)
 
 
 # --- 4. MEDAL PREDICTION MODEL ---
